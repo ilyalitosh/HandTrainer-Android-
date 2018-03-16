@@ -1,10 +1,19 @@
 package com.litosh.ilya.handtrainer;
 
+import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.litosh.ilya.handtrainer.adapters.ViewPagerAdapter;
 
@@ -17,6 +26,77 @@ public class MainActivity extends AppCompatActivity {
     private List<View> pages;
     private ViewPagerAdapter adapter;
     private ViewPager viewPager;
+    private TextView angleView;
+    private Button buttonStartStop;
+    private EditText inputCountRotations;
+    private TextView sessionCountRotationsText;
+    private TextView wholeCountRotationsText;
+    private RelativeLayout background;
+    private SensorManager sensorManager;
+    private Sensor sensorAccelerometer;
+    private boolean isStart = false;
+    private byte side = 0;// -1 - лево, 1 - право
+    private int sessionCountRotations;
+    private int wholeCountRotations = 0;
+    private SensorEventListener accelerometerListener = new SensorEventListener() {
+        int iterator;
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            double angle = Math.toDegrees(Math.atan(sensorEvent.values[0]
+                                          / Math.sqrt(Math.pow(sensorEvent.values[1], 2)
+                                                      + Math.pow(sensorEvent.values[2], 2))));
+            if(!isStart){
+                if(Math.round(angle) >= 80){
+                    isStart = true;
+                    iterator = 0;
+                    angleView.setText(String.valueOf(iterator));
+                    side = 1;
+                }
+            }else{
+                switch(side){
+                    case -1:
+                        if(Math.round(angle) >= 80){
+                            iterator++;
+                            wholeCountRotations++;
+                            StringBuilder s = new StringBuilder(String.valueOf(iterator));
+                            s.append("/").append(sessionCountRotations);
+                            sessionCountRotationsText.setText(s);
+                            wholeCountRotationsText.setText(String.valueOf(wholeCountRotations));
+                            angleView.setText(String.valueOf(iterator));
+                            side = 1;
+                        }
+                        break;
+                    case 1:
+                        if(Math.round(angle) <= -80){
+                            iterator++;
+                            wholeCountRotations++;
+                            StringBuilder s = new StringBuilder(String.valueOf(iterator));
+                            s.append("/").append(sessionCountRotations);
+                            sessionCountRotationsText.setText(s);
+                            wholeCountRotationsText.setText(String.valueOf(wholeCountRotations));
+                            angleView.setText(String.valueOf(iterator));
+                            side = -1;
+                        }
+                        break;
+                }
+                if(iterator == sessionCountRotations){
+                    background.setBackgroundColor(Color.GREEN);
+                    side = 0;
+                }
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
+        }
+    };
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(accelerometerListener, sensorAccelerometer);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +110,60 @@ public class MainActivity extends AppCompatActivity {
         View statsPageView = layoutInflater.inflate(R.layout.stats_page, null);
         pages.add(statsPageView);
 
+        initComponents(trainerPageView, statsPageView);
+
         adapter = new ViewPagerAdapter(pages);
-        viewPager = (ViewPager)findViewById(R.id.view_pager);
+        viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(adapter);
 
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        initListeners();
+
     }
+
+    public void initComponents(View trainerPage, View statsPage){
+        angleView = trainerPage.findViewById(R.id.angle_textview_trainerpage);
+        buttonStartStop = trainerPage.findViewById(R.id.startstop_button_trainerpage);
+        inputCountRotations = trainerPage.findViewById(R.id.input_count_rotations_trainerpage);
+        sessionCountRotationsText = trainerPage.findViewById(R.id.session_count_rotations_textview_trainerpage);
+        wholeCountRotationsText = trainerPage.findViewById(R.id.whole_count_rotations_textview_trainerpage);
+        background = trainerPage.findViewById(R.id.background_trainer_page);
+    }
+
+    public void initListeners(){
+        buttonStartStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isStart){
+                    sensorManager.unregisterListener(accelerometerListener, sensorAccelerometer);
+                    background.setBackgroundColor(getResources().getColor(R.color.colorBackground));
+                    buttonStartStop.setText("Начать");
+                    isStart = false;
+                    angleView.setVisibility(View.GONE);
+                    angleView.setText(getString(R.string.start_message));
+                    inputCountRotations.setVisibility(View.VISIBLE);
+                    StringBuilder s = new StringBuilder("0/");
+                    s.append(sessionCountRotations);
+                    sessionCountRotationsText.setText(s);
+                }else{
+                    background.setBackgroundColor(getResources().getColor(R.color.colorBackground));
+                    inputCountRotations.setVisibility(View.GONE);
+                    angleView.setVisibility(View.VISIBLE);
+                    if(inputCountRotations.getText().toString().equals("")){
+                        sessionCountRotationsText.setText("свободная");
+                    }else{
+                        sessionCountRotations = Integer.valueOf(inputCountRotations.getText().toString());
+                        StringBuilder s = new StringBuilder("0/");
+                        s.append(sessionCountRotations);
+                        sessionCountRotationsText.setText(s);
+                    }
+                    buttonStartStop.setText("Стоп");
+                    sensorManager.registerListener(accelerometerListener, sensorAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+                }
+            }
+        });
+    }
+
 }
