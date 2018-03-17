@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/trainer_nav_menu"
+        android:title="@string/title_trainer_nav_menu">
+
+    </item>
+    <item
+        android:id="@+id/stats_nav_menu"
+        android:title="@string/title_stats_nav_menu">
+
+    </item>
+    <item
+        android:id="@+id/exit_nav_menu"
+        android:title="@string/title_exit_nav_menu">
+
+    </item>
+</menu>

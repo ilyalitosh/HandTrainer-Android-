@@ -1,14 +1,21 @@
 package com.litosh.ilya.handtrainer;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,9 +23,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.litosh.ilya.handtrainer.adapters.ViewPagerAdapter;
+import com.litosh.ilya.handtrainer.db.DBService;
+import com.litosh.ilya.handtrainer.db.models.Activity;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,13 +42,18 @@ public class MainActivity extends AppCompatActivity {
     private EditText inputCountRotations;
     private TextView sessionCountRotationsText;
     private TextView wholeCountRotationsText;
+    private TextView headerNavMenu;
     private RelativeLayout background;
     private SensorManager sensorManager;
     private Sensor sensorAccelerometer;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
     private boolean isStart = false;
     private byte side = 0;// -1 - лево, 1 - право
     private int sessionCountRotations;
     private int wholeCountRotations = 0;
+    private boolean isBurgerPressed = false;
+    private DBService dbService;
     private SensorEventListener accelerometerListener = new SensorEventListener() {
         int iterator;
         @Override
@@ -103,6 +119,35 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Realm.init(this);
+        dbService = new DBService();
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, null, R.string.navigation_bar_open, R.string.navigation_bar_close){
+            @Override
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                isBurgerPressed = false;
+            }
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                isBurgerPressed = true;
+            }
+
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
+            }
+        };
+        drawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
+
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.addHeaderView(getLayoutInflater().inflate(R.layout.header_nav_menu, null));
+
         layoutInflater = getLayoutInflater();
         pages = new ArrayList<>();
         View trainerPageView = layoutInflater.inflate(R.layout.trainer_page, null);
@@ -121,6 +166,21 @@ public class MainActivity extends AppCompatActivity {
 
         initListeners();
 
+        Button buttonAdd = trainerPageView.findViewById(R.id.button1);
+        Button buttonShow = trainerPageView.findViewById(R.id.button2);
+        buttonAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        buttonShow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
     }
 
     public void initComponents(View trainerPage, View statsPage){
@@ -130,6 +190,8 @@ public class MainActivity extends AppCompatActivity {
         sessionCountRotationsText = trainerPage.findViewById(R.id.session_count_rotations_textview_trainerpage);
         wholeCountRotationsText = trainerPage.findViewById(R.id.whole_count_rotations_textview_trainerpage);
         background = trainerPage.findViewById(R.id.background_trainer_page);
+        headerNavMenu = navigationView.getHeaderView(0).findViewById(R.id.title_header_nav_menu);
+        headerNavMenu.setText(User.getUserLogin());
     }
 
     public void initListeners(){
@@ -164,6 +226,45 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.trainer_nav_menu:
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        viewPager.setCurrentItem(0, true);
+                        return true;
+                    case R.id.stats_nav_menu:
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        viewPager.setCurrentItem(1, true);
+                        return true;
+                    case R.id.exit_nav_menu:
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        User.setActivity(0);
+                        Activity activity = new Activity();
+                        activity.setId(0L);
+                        activity.setActivity(0);
+                        dbService.updateActivity(activity);
+                        Intent intent = new Intent(MainActivity.this, AuthActivity.class);
+                        startActivity(intent);
+                        finish();
+                        return true;
+                }
+                return false;
+            }
+        });
+
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            if(isBurgerPressed){
+                drawerLayout.closeDrawer(GravityCompat.START);
+            }else{
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
