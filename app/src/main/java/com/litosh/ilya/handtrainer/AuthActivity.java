@@ -106,6 +106,7 @@ public class AuthActivity extends AppCompatActivity {
                                     User.setActivity(1);
                                     User.setUserId(list.get(i).getId());
                                     User.setUserLogin(list.get(i).getLogin());
+                                    User.setWholeCountRotations(list.get(i).getWholeCountRotations());
                                     Activity activity = new Activity();
                                     activity.setId(0L);
                                     activity.setActivity(1);

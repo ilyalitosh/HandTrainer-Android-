@@ -16,6 +16,8 @@ public class Person extends RealmObject {
 
     private String password;
 
+    private int wholeCountRotations;
+
     public long getId() {
         return id;
     }
@@ -38,5 +40,13 @@ public class Person extends RealmObject {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getWholeCountRotations() {
+        return wholeCountRotations;
+    }
+
+    public void setWholeCountRotations(int wholeCountRotations) {
+        this.wholeCountRotations = wholeCountRotations;
     }
 }

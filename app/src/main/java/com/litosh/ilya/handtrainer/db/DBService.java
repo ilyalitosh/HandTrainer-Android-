@@ -47,6 +47,14 @@ public class DBService {
         return list;
     }
 
+    public void updateCountRotationsPerson(Person person){
+        Realm realm = Realm.getInstance(dbConfig);
+        realm.beginTransaction();
+        Person result = realm.where(Person.class).equalTo("id", person.getId()).findFirst();
+        result.setWholeCountRotations(person.getWholeCountRotations());
+        realm.commitTransaction();
+    }
+
     public void addNote(Note note){
         Realm realm = Realm.getInstance(dbConfig);
         realm.beginTransaction();
@@ -59,6 +67,26 @@ public class DBService {
         realm.beginTransaction();
         RealmResults<Note> result;
         result = realm.where(Note.class).findAll();
+        List<Note> list = new ArrayList<>();
+        list.addAll(result);
+        realm.commitTransaction();
+        return list;
+    }
+
+    public void deleteNotesById(long id){
+        Realm realm = Realm.getInstance(dbConfig);
+        realm.beginTransaction();
+        RealmResults<Note> result;
+        result = realm.where(Note.class).equalTo("id", id).findAll();
+        result.deleteAllFromRealm();
+        realm.commitTransaction();
+    }
+
+    public List<Note> getNotesById(long id){
+        Realm realm = Realm.getInstance(dbConfig);
+        realm.beginTransaction();
+        RealmResults<Note> result;
+        result = realm.where(Note.class).equalTo("id", id).findAll();
         List<Note> list = new ArrayList<>();
         list.addAll(result);
         realm.commitTransaction();

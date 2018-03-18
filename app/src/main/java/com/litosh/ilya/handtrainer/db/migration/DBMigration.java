@@ -15,11 +15,14 @@ public class DBMigration implements RealmMigration {
         if(oldVersion == 0){
             schema.create("Person")
                     .addField("login", String.class)
-                    .addField("password", String.class);
+                    .addField("password", String.class)
+                    .addField("wholeCountRotations", Integer.class);
             schema.create("Note")
                     .addField("id", Long.class)
                     .addField("task", String.class)
-                    .addField("comment", String.class);
+                    .addField("comment", String.class)
+                    .addField("duration", Integer.class)
+                    .addField("date", String.class);
             schema.create("Activity")
                     .addField("activity", Integer.class)
                     .addField("userId", Long.class);

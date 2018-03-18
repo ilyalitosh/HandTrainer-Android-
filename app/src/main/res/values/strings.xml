@@ -3,7 +3,7 @@
 
     <string name="developer_name">Ilya Litosh</string>
 
-    <string name="start_message">Поверни на 90 градусов влево чтобы начать</string>
+    <string name="start_message">Поверните на 90 градусов влево, чтобы начать</string>
 
     <string name="navigation_bar_open">Bar has been opened</string>
     <string name="navigation_bar_close">Bar has been closed</string>
@@ -13,4 +13,38 @@
     <string name="title_exit_nav_menu">Выйти</string>
 
     <string name="default_login_name_header_nav_menu">Login Name</string>
+    <string name="reset_stats_app_menu">Сбросить статистику</string>
+    <string name="goal_title_statslist_item">Цель:</string>
+    <string name="default_value_goal_statslist">0</string>
+    <string name="finished_title_statslist">Выполнено:</string>
+    <string name="default_value_finished_statslist">0</string>
+    <string name="duration_title_statslist">Продолжительность:</string>
+    <string name="default_value_duration_statslist">0 сек.</string>
+    <string name="date_statslist">Дата:</string>
+    <string name="default_value_date_statslist">2000-02-19 10:10:58</string>
+    <string name="comment_title_stats_list">Комментарий:</string>
+    <string name="default_value_comment_statslist">Текст</string>
+    <string name="allrotations_title_statspage">Общее кол-во поворотов:</string>
+    <string name="default_value_allrotations_statspage">0</string>
+
+    <string name="session_rotations_title_trainer_page">Кол-во:</string>
+    <string name="default_value_session_rotations_trainer_page">0/0</string>
+    <string name="allrotations_title_trainer_page">Общее кол-во:</string>
+    <string name="default_value_allrotations_trainerpage">0</string>
+    <string name="duration_title_trainerpage">Время:</string>
+    <string name="default_value_duration_trainerpage">0 сек</string>
+    <string name="startstop_button_title_trainerpage">Начать</string>
+    <string name="input_count_rotations_hint_trainerpage">введите кол-во</string>
+
+    <string name="inputauth_login_hint_authpage">логин</string>
+    <string name="inputauth_pass_hint_authpage">пароль</string>
+    <string name="buttonauth_submitbutton_authpage">Войти</string>
+    <string name="buttonauth_newuser_button_authpage">Новый пользователь</string>
+    <string name="inputregister_login_hint_authpage">логин</string>
+    <string name="inputregister_pass_hint_authpage">пароль</string>
+    <string name="buttonregister_submit_authpage">зарегистрироваться</string>
+    <string name="question_title_commentdialog">Оставить комментарий?</string>
+    <string name="yes_button_title_commentdialog">да</string>
+    <string name="no_button_title_commentdialog">Нет</string>
+    <string name="submit_button_title_commentdialog">Отправить</string>
 </resources>

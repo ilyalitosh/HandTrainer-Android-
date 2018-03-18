@@ -21,13 +21,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Кол-во:"
+                android:text="@string/session_rotations_title_trainer_page"
                 android:textSize="15sp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/session_count_rotations_textview_trainerpage"
-                android:text="0/0"
+                android:text="@string/default_value_session_rotations_trainer_page"
                 android:layout_marginEnd="6dp"
                 android:textSize="18sp"/>
 
@@ -41,13 +41,33 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Общее кол-во:"
+                android:text="@string/allrotations_title_trainer_page"
                 android:textSize="15sp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/whole_count_rotations_textview_trainerpage"
-                android:text="0"
+                android:text="@string/default_value_allrotations_trainerpage"
+                android:layout_marginEnd="6dp"
+                android:textSize="18sp"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/duration_title_trainerpage"
+                android:textSize="15sp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/duration_rotations_textview_trainerpage"
+                android:text="@string/default_value_duration_trainerpage"
                 android:layout_marginEnd="6dp"
                 android:textSize="18sp"/>
 
@@ -73,27 +93,15 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="number"
             android:id="@+id/input_count_rotations_trainerpage"
-            android:hint="введите кол-во"/>
+            android:hint="@string/input_count_rotations_hint_trainerpage"/>
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/startstop_button_trainerpage"
-            android:text="Начать"/>
+            android:text="@string/startstop_button_title_trainerpage"/>
 
     </LinearLayout>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="добавить"
-        android:id="@+id/button1"/>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="посмотреть"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/button2"/>
 
 </RelativeLayout>

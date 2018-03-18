@@ -37,6 +37,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                     if(User.getActivity() == 1){
                         List<Person> list = dbService.getPersons();
                         User.setUserLogin(list.get((int)User.getUserId()).getLogin());
+                        User.setWholeCountRotations(list.get((int)User.getUserId()).getWholeCountRotations());
                         Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
@@ -52,7 +53,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 }
 
             }
-        }, 0);
+        }, 5000);
 
     }
 }

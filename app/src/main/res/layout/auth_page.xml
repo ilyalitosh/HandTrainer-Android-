@@ -22,22 +22,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/inputauth_login_authform_authpage"
-                android:hint="логин"/>
+                android:hint="@string/inputauth_login_hint_authpage"/>
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textPassword"
                 android:id="@+id/inputauth_pass_authform_authpage"
-                android:hint="пароль"/>
+                android:hint="@string/inputauth_pass_hint_authpage"/>
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/buttonauth_enter_authform_authpage"
-                android:hint="Войти"/>
+                android:hint="@string/buttonauth_submitbutton_authpage"/>
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/buttonauth_register_authform_authpage"
-                android:hint="Новый пользователь"/>
+                android:hint="@string/buttonauth_newuser_button_authpage"/>
 
         </LinearLayout>
 
@@ -53,17 +54,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/inputregister_login_registerform_authpage"
-                android:hint="логин"/>
+                android:hint="@string/inputregister_login_hint_authpage"/>
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textPassword"
                 android:id="@+id/inputregister_pass_registerform_authpage"
-                android:hint="пароль"/>
+                android:hint="@string/inputregister_pass_hint_authpage"/>
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/buttonregister_submit_registerform_authpage"
-                android:hint="зарегистрироваться"/>
+                android:hint="@string/buttonregister_submit_authpage"/>
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

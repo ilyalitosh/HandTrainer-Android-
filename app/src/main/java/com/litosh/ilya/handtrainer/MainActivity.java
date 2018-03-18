@@ -1,5 +1,6 @@
 package com.litosh.ilya.handtrainer;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -15,18 +16,24 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.litosh.ilya.handtrainer.adapters.StatsListAdapter;
 import com.litosh.ilya.handtrainer.adapters.ViewPagerAdapter;
 import com.litosh.ilya.handtrainer.db.DBService;
 import com.litosh.ilya.handtrainer.db.models.Activity;
+import com.litosh.ilya.handtrainer.db.models.Person;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import io.realm.Realm;
@@ -43,19 +50,24 @@ public class MainActivity extends AppCompatActivity {
     private TextView sessionCountRotationsText;
     private TextView wholeCountRotationsText;
     private TextView headerNavMenu;
+    private TextView wholeCountRotationsTextStats;
+    private TextView durationTime;
     private RelativeLayout background;
+    private ListView statsList;
     private SensorManager sensorManager;
     private Sensor sensorAccelerometer;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private boolean isStart = false;
     private byte side = 0;// -1 - лево, 1 - право
-    private int sessionCountRotations;
+    private int sessionCountRotations; // -1 - свободная тренировка
     private int wholeCountRotations = 0;
     private boolean isBurgerPressed = false;
     private DBService dbService;
+    private int iterator;
+    private int duration;
+    private String date;
     private SensorEventListener accelerometerListener = new SensorEventListener() {
-        int iterator;
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
             double angle = Math.toDegrees(Math.atan(sensorEvent.values[0]
@@ -63,10 +75,35 @@ public class MainActivity extends AppCompatActivity {
                                                       + Math.pow(sensorEvent.values[2], 2))));
             if(!isStart){
                 if(Math.round(angle) >= 80){
+                    Calendar c = Calendar.getInstance();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    date = sdf.format(c.getTime());
                     isStart = true;
                     iterator = 0;
+                    duration = 0;
                     angleView.setText(String.valueOf(iterator));
                     side = 1;
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            while (isStart){
+                                System.out.println(duration);
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {}
+                                if(side != 0){
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            duration++;
+                                            StringBuilder s = new StringBuilder(String.valueOf(duration)).append(" сек");
+                                            durationTime.setText(s);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }).start();
                 }
             }else{
                 switch(side){
@@ -74,10 +111,15 @@ public class MainActivity extends AppCompatActivity {
                         if(Math.round(angle) >= 80){
                             iterator++;
                             wholeCountRotations++;
-                            StringBuilder s = new StringBuilder(String.valueOf(iterator));
-                            s.append("/").append(sessionCountRotations);
-                            sessionCountRotationsText.setText(s);
+                            if(sessionCountRotations == -1){
+                                sessionCountRotationsText.setText(String.valueOf(iterator));
+                            }else {
+                                StringBuilder s = new StringBuilder(String.valueOf(iterator));
+                                s.append("/").append(sessionCountRotations);
+                                sessionCountRotationsText.setText(s);
+                            }
                             wholeCountRotationsText.setText(String.valueOf(wholeCountRotations));
+                            wholeCountRotationsTextStats.setText(String.valueOf(wholeCountRotations));
                             angleView.setText(String.valueOf(iterator));
                             side = 1;
                         }
@@ -86,10 +128,15 @@ public class MainActivity extends AppCompatActivity {
                         if(Math.round(angle) <= -80){
                             iterator++;
                             wholeCountRotations++;
-                            StringBuilder s = new StringBuilder(String.valueOf(iterator));
-                            s.append("/").append(sessionCountRotations);
-                            sessionCountRotationsText.setText(s);
+                            if(sessionCountRotations == -1){
+                                sessionCountRotationsText.setText(String.valueOf(iterator));
+                            }else {
+                                StringBuilder s = new StringBuilder(String.valueOf(iterator));
+                                s.append("/").append(sessionCountRotations);
+                                sessionCountRotationsText.setText(s);
+                            }
                             wholeCountRotationsText.setText(String.valueOf(wholeCountRotations));
+                            wholeCountRotationsTextStats.setText(String.valueOf(wholeCountRotations));
                             angleView.setText(String.valueOf(iterator));
                             side = -1;
                         }
@@ -118,7 +165,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Realm.init(this);
@@ -166,21 +212,6 @@ public class MainActivity extends AppCompatActivity {
 
         initListeners();
 
-        Button buttonAdd = trainerPageView.findViewById(R.id.button1);
-        Button buttonShow = trainerPageView.findViewById(R.id.button2);
-        buttonAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-        buttonShow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
     }
 
     public void initComponents(View trainerPage, View statsPage){
@@ -189,9 +220,18 @@ public class MainActivity extends AppCompatActivity {
         inputCountRotations = trainerPage.findViewById(R.id.input_count_rotations_trainerpage);
         sessionCountRotationsText = trainerPage.findViewById(R.id.session_count_rotations_textview_trainerpage);
         wholeCountRotationsText = trainerPage.findViewById(R.id.whole_count_rotations_textview_trainerpage);
+        durationTime = trainerPage.findViewById(R.id.duration_rotations_textview_trainerpage);
+        wholeCountRotations = User.getWholeCountRotations();
+        wholeCountRotationsText.setText(String.valueOf(wholeCountRotations));
         background = trainerPage.findViewById(R.id.background_trainer_page);
         headerNavMenu = navigationView.getHeaderView(0).findViewById(R.id.title_header_nav_menu);
         headerNavMenu.setText(User.getUserLogin());
+        statsList = statsPage.findViewById(R.id.stats_listview_statpage);
+        wholeCountRotationsTextStats = statsPage.findViewById(R.id.whole_count_rotations_textview_statpage);
+        wholeCountRotationsTextStats.setText(String.valueOf(wholeCountRotations));
+        StatsListAdapter adapter = new StatsListAdapter(this);
+        statsList.setAdapter(adapter);
+
     }
 
     public void initListeners(){
@@ -206,15 +246,40 @@ public class MainActivity extends AppCompatActivity {
                     angleView.setVisibility(View.GONE);
                     angleView.setText(getString(R.string.start_message));
                     inputCountRotations.setVisibility(View.VISIBLE);
-                    StringBuilder s = new StringBuilder("0/");
-                    s.append(sessionCountRotations);
-                    sessionCountRotationsText.setText(s);
+                    if(sessionCountRotations == -1){
+                        sessionCountRotationsText.setText(String.valueOf(0));
+                    }else {
+                        StringBuilder s = new StringBuilder(String.valueOf(0));
+                        s.append("/").append(sessionCountRotations);
+                        sessionCountRotationsText.setText(s);
+                    }
+                    Person person = new Person();
+                    person.setId(User.getUserId());
+                    person.setWholeCountRotations(wholeCountRotations);
+                    dbService.updateCountRotationsPerson(person);
+
+                    User.setSessionCountRotations(sessionCountRotations);
+                    User.setFinishedCountRotations(iterator);
+                    User.setCurrentDuration(duration);
+                    User.setCurrentDate(date);
+
+                    CommentDialog a1 = new CommentDialog(MainActivity.this);
+                    a1.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialogInterface) {
+                            StatsListAdapter adapter = new StatsListAdapter(MainActivity.this);
+                            statsList.setAdapter(adapter);
+                        }
+                    });
+                    a1.show();
+
                 }else{
                     background.setBackgroundColor(getResources().getColor(R.color.colorBackground));
                     inputCountRotations.setVisibility(View.GONE);
                     angleView.setVisibility(View.VISIBLE);
                     if(inputCountRotations.getText().toString().equals("")){
-                        sessionCountRotationsText.setText("свободная");
+                        sessionCountRotationsText.setText("0");
+                        sessionCountRotations = -1;
                     }else{
                         sessionCountRotations = Integer.valueOf(inputCountRotations.getText().toString());
                         StringBuilder s = new StringBuilder("0/");
@@ -257,14 +322,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.application_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
-            if(isBurgerPressed){
-                drawerLayout.closeDrawer(GravityCompat.START);
-            }else{
-                drawerLayout.openDrawer(GravityCompat.START);
-            }
+        switch(item.getItemId()){
+            case android.R.id.home:
+                if(isBurgerPressed){
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }else{
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }
+                break;
+            case R.id.reset_stats:
+                resetStats();
+                StatsListAdapter adapter = new StatsListAdapter(MainActivity.this);
+                statsList.setAdapter(adapter);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void resetStats(){
+        dbService.deleteNotesById(User.getUserId());
+
+        Person person = new Person();
+        person.setId(User.getUserId());
+        person.setWholeCountRotations(0);
+        dbService.updateCountRotationsPerson(person);
+
+        User.setWholeCountRotations(0);
+        wholeCountRotations = 0;
+        wholeCountRotationsText.setText(String.valueOf(0));
+        wholeCountRotationsTextStats.setText(String.valueOf(0));
+    }
+
 }

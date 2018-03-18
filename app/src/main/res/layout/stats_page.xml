@@ -7,7 +7,26 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="Здесь будет статистика"/>
+        android:text="@string/allrotations_title_statspage"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="5dp"
+        android:textSize="18sp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/default_value_allrotations_statspage"
+        android:id="@+id/whole_count_rotations_textview_statpage"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_alignParentEnd="true"
+        android:textSize="18sp"/>
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/stats_listview_statpage"
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/whole_count_rotations_textview_statpage">
+
+    </ListView>
 
 </RelativeLayout>

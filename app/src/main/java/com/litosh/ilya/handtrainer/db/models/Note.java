@@ -14,6 +14,10 @@ public class Note extends RealmObject {
 
     private String comment;
 
+    private int duration;
+
+    private String date;
+
     public long getId() {
         return id;
     }
@@ -36,5 +40,21 @@ public class Note extends RealmObject {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }
